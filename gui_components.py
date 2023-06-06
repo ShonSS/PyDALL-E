@@ -8,6 +8,7 @@ from kivy.uix.label import Label
 from api_handler import send_request, validate_input
 from utils import configure_logging, get_kivy_image_from_url
 
+
 configure_logging()
 
 
@@ -27,7 +28,8 @@ class MainLayout(BoxLayout):
     def __init__(self, **kwargs):
         super(MainLayout, self).__init__(orientation="vertical", **kwargs)
 
-        self.text_input = TextInput(hint_text="Enter your description here", multiline=False)
+        self.text_input = TextInput(hint_text="Enter your description here", multiline=True, size_hint_y=None,
+                                    height=300)
         self.add_widget(self.text_input)
 
         config_layout = BoxLayout(orientation="horizontal", size_hint_y=None, height=30)
@@ -41,14 +43,14 @@ class MainLayout(BoxLayout):
 
         self.add_widget(config_layout)
 
-        generate_button = Button(text="Generate Image")
+        generate_button = Button(text="Create Art", size_hint_y=None, height=40)
         generate_button.bind(on_press=self.generate_image)
         self.add_widget(generate_button)
 
-        self.image_display = GridLayout(cols=2)
+        self.image_display = GridLayout(cols=2, spacing=10, padding=[10, 10, 10, 10])
         self.add_widget(self.image_display)
 
-        self.progress_bar = ProgressBar(max=100)
+        self.progress_bar = ProgressBar(max=100, size_hint_y=None, height=10)
         self.add_widget(self.progress_bar)
 
     def generate_image(self, instance):
