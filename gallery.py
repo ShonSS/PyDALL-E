@@ -1,3 +1,4 @@
+# gallery.py
 import requests
 from PyQt6.QtWidgets import QWidget, QLabel, QGridLayout
 from PyQt6.QtGui import QPixmap, QColor
@@ -14,6 +15,10 @@ class ImageGallery(QWidget):
         self.setStyleSheet("background-color: black;")
 
         self.image_labels = []  # Store the labels for the images
+
+        # Set the maximum size of the gallery window
+        self.setMaximumWidth(800)
+        self.setMaximumHeight(600)
 
     def display_images(self, urls):
         # Clear previous images
