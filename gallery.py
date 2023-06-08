@@ -1,10 +1,19 @@
-# gallery.py
 import requests
 from PyQt6.QtWidgets import QWidget, QLabel, QGridLayout
-from PyQt6.QtGui import QPixmap, QColor
+from PyQt6.QtGui import QPixmap
+from PyQt6.QtCore import Qt, pyqtSignal
+
+class ClickableLabel(QLabel):
+    clicked = pyqtSignal()
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.clicked.emit()
 
 
 class ImageGallery(QWidget):
+    imageClicked = pyqtSignal(QPixmap)
+
     def __init__(self):
         super().__init__()
 
@@ -29,13 +38,18 @@ class ImageGallery(QWidget):
             response = requests.get(url)
             image_data = response.content
 
-            # Convert the image data to QPixmap and add it to a QLabel
+            # Convert the image data to QPixmap and add it to a ClickableLabel as a thumbnail
             pixmap = QPixmap()
             pixmap.loadFromData(image_data)
-            label = QLabel()
-            label.setPixmap(pixmap)
+            thumbnail = pixmap.scaledToWidth(150)
 
-            # Add the QLabel to the layout
+            label = ClickableLabel()
+            label.setPixmap(thumbnail)
+            label.setCursor(Qt.CursorShape.PointingHandCursor)
+            label.setObjectName(f"thumbnail_{i}")
+            label.clicked.connect(lambda checked, label=label: self.handle_image_clicked(label))
+
+            # Add the ClickableLabel to the layout
             row = i // 3  # 3 images per row
             col = i % 3
             self.layout.addWidget(label, row, col)
@@ -50,3 +64,7 @@ class ImageGallery(QWidget):
 
         # Clear the list of image labels
         self.image_labels = []
+
+    def handle_image_clicked(self, label):
+        pixmap = label.pixmap()
+        self.imageClicked.emit(pixmap)

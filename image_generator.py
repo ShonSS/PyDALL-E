@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 import openai
 import os
 from PyQt6.QtCore import QThread, pyqtSignal
+from PyQt6.QtGui import QPixmap
 
 
 class ImageGenerator(QThread):

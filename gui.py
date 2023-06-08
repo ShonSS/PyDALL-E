@@ -1,12 +1,9 @@
-# gui.py
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QPlainTextEdit, QComboBox, QFormLayout, QStatusBar, QMainWindow, QDialog
+from PyQt6.QtGui import QPalette, QColor, QPixmap, QGuiApplication
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QWidget, QPushButton, QPlainTextEdit, QComboBox, QFormLayout, QStatusBar, QMainWindow, \
-    QApplication
-from PyQt6.QtGui import QPalette, QColor, QGuiApplication
-
-from gallery import ImageGallery
+from PyQt6.QtWidgets import QSizePolicy
 from image_generator import ImageGenerator
-
+from gallery import ImageGallery
 
 
 class ImageGeneratorApp(QMainWindow):
@@ -40,6 +37,7 @@ class ImageGeneratorApp(QMainWindow):
         self.layout.addRow("Number of Images:", self.numberInput)
         self.layout.addRow("Image Size:", self.sizeInput)
         self.layout.addRow(self.generateButton)
+        self.layout.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.AllNonFixedFieldsGrow)
 
         # Central Widget
         self.centralWidget = QWidget(self)
@@ -50,14 +48,24 @@ class ImageGeneratorApp(QMainWindow):
         self.gallery = ImageGallery()
         self.gallery.hide()  # Hide the gallery initially
 
+        # Set the central widget's layout properties
+        self.centralWidget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+
     def on_generate_click(self):
         if self.imageGeneratorThread and self.imageGeneratorThread.isRunning():
             return
 
+        # Destroy the previous image gallery
+        self.gallery.deleteLater()
+
+        self.gallery = ImageGallery()  # Create a new instance of ImageGallery
+        self.gallery.hide()  # Hide the gallery initially
+
         self.gallery.clear_images()  # Clear previous images from the gallery
 
         # Create an instance of ImageGenerator and move it to a separate thread
-        self.imageGeneratorThread = ImageGenerator(self.promptInput.toPlainText(), int(self.numberInput.currentText()), self.sizeInput.currentText())
+        self.imageGeneratorThread = ImageGenerator(self.promptInput.toPlainText(), int(self.numberInput.currentText()),
+                                                   self.sizeInput.currentText())
         self.imageGeneratorThread.progressChanged.connect(self.handle_image_generation_progress)
         self.imageGeneratorThread.finished.connect(self.handle_image_generation_finished)
         self.imageGeneratorThread.start()
@@ -74,14 +82,7 @@ class ImageGeneratorApp(QMainWindow):
         self.gallery.show()
 
         # Reset the loading message or progress indicator
-        self.statusBar.showMessage("Image generation completed.")
-
-    def closeEvent(self, event):
-        if self.imageGeneratorThread and self.imageGeneratorThread.isRunning():
-            self.imageGeneratorThread.quit()
-            self.imageGeneratorThread.wait()
-
-        event.accept()
+        self.statusBar.clearMessage()
 
     def set_dark_mode(self):
         palette = QPalette()
@@ -104,18 +105,16 @@ class ImageGeneratorApp(QMainWindow):
         # Reset to the default palette for light mode
         self.setPalette(QGuiApplication.palette())
 
+    def show_full_image(self, pixmap):
+        full_image_dialog = QDialog(self)
+        full_image_dialog.setWindowTitle("Full Size Image")
 
-def main():
-    # Create the application
-    app = QApplication([])
+        full_image_label = QLabel()
+        full_image_label.setPixmap(pixmap)
+        full_image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-    # Create and show the main window
-    window = ImageGeneratorApp()
-    window.show()
+        layout = QVBoxLayout()
+        layout.addWidget(full_image_label)
 
-    # Run the event loop
-    app.exec()
-
-
-if __name__ == "__main__":
-    main()
+        full_image_dialog.setLayout(layout)
+        full_image_dialog.exec()
