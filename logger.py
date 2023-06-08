@@ -1,19 +1,17 @@
+import logging
+from logging.handlers import TimedRotatingFileHandler
+
 # logger.py
 
-import logging
-
 def setup_logger(name):
-    formatter = logging.Formatter(fmt='%(asctime)s %(levelname)-8s %(message)s',
-                                  datefmt='%Y-%m-%d %H:%M:%S')
-    handler = logging.FileHandler('log.txt', mode='w')
-    handler.setFormatter(formatter)
-
-    screen_handler = logging.StreamHandler(stream=None)
-    screen_handler.setFormatter(formatter)
-
     logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)
-    logger.addHandler(handler)
-    logger.addHandler(screen_handler)
+
+    formatter = logging.Formatter(fmt='%(asctime)s %(levelname)-8s %(message)s',
+                                  datefmt='%Y-%m-%d %H:%M:%S')
+
+    file_handler = TimedRotatingFileHandler('log.txt', when='midnight', backupCount=7)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
 
     return logger

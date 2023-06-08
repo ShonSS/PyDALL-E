@@ -12,10 +12,15 @@ class ImageGallery(QWidget):
         self.setLayout(self.layout)
         self.setWindowTitle('Generated Artwork')
 
+        self.image_labels = []  # Store the labels for the images
+
     def display_images(self, urls):
-        for i in range(len(urls)):
+        # Clear previous images
+        self.clear_images()
+
+        for i, url in enumerate(urls):
             # Download the image
-            response = requests.get(urls[i])
+            response = requests.get(url)
             image_data = response.content
 
             # Convert the image data to QPixmap and add it to a QLabel
@@ -28,3 +33,15 @@ class ImageGallery(QWidget):
             row = i // 3  # 3 images per row
             col = i % 3
             self.layout.addWidget(label, row, col)
+
+            # Store the label for later use
+            self.image_labels.append(label)
+
+    def clear_images(self):
+        # Remove and delete the image labels
+        for label in self.image_labels:
+            label.deleteLater()
+
+        # Clear the list of image labels
+        self.image_labels = []
+

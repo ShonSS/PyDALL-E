@@ -3,6 +3,8 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QLineEdit
     QMainWindow
 from PyQt6.QtGui import QFont
 from PyQt6.QtCore import Qt
+
+from gallery import ImageGallery
 from image_generator import ImageGenerator
 
 
@@ -19,6 +21,8 @@ class ImageGeneratorApp(QMainWindow):
         self.sizeInput.addItems(["256x256", "512x512", "1024x1024"])
         self.generateButton = QPushButton("Generate Artwork", self)
         self.generateButton.clicked.connect(self.on_generate_click)
+
+        self.gallery = ImageGallery()
 
         # Status Bar
         self.statusBar = QStatusBar()
@@ -37,6 +41,13 @@ class ImageGeneratorApp(QMainWindow):
         self.setCentralWidget(self.centralWidget)
 
     def on_generate_click(self):
+        self.gallery.clear_images()  # Clear previous images from the gallery
+
         self.image_generator = ImageGenerator(self.promptInput.text(), int(self.numberInput.currentText()),
                                               self.sizeInput.currentText(), self.statusBar)
+        self.image_generator.gallery = self.gallery  # Pass the gallery instance to ImageGenerator
         self.image_generator.generate_images()
+
+        # Display the generated images in the gallery
+        self.gallery.display_images(self.image_generator.urls)
+        self.gallery.show()
