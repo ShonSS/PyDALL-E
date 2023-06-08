@@ -1,37 +1,90 @@
-# main.py
-from PyQt6.QtWidgets import QApplication
-from gui import ImageGeneratorApp
-import sys
-import logging
-from logging.handlers import TimedRotatingFileHandler
+from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QLabel, QLineEdit, QComboBox, QFormLayout, QStatusBar
+from PyQt6.QtCore import Qt, pyqtSignal
+from image_generator import ImageGenerator
+from gallery import ImageGallery
 
-def setup_logging():
-    logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)
 
-    formatter = logging.Formatter(fmt='%(asctime)s %(levelname)-8s %(message)s',
-                                  datefmt='%Y-%m-%d %H:%M:%S')
+class ImageGeneratorApp(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("PyDALL-E")
 
-    file_handler = TimedRotatingFileHandler('log.txt', when='midnight', backupCount=7)
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
+        # UI Elements
+        self.promptInput = QLineEdit(self)
+        self.numberInput = QComboBox(self)
+        self.numberInput.addItems([str(i) for i in range(1, 11)])  # for example 1-10 images
+        self.sizeInput = QComboBox(self)
+        self.sizeInput.addItems(["256x256", "512x512", "1024x1024"])
+        self.generateButton = QPushButton("Generate Artwork", self)
+        self.generateButton.clicked.connect(self.on_generate_click)
 
-    # Exclude DEBUG level for the 'openai' logger
-    openai_logger = logging.getLogger('openai')
-    openai_logger.setLevel(logging.INFO)  # Change the logging level to INFO or higher
+        # Status Bar
+        self.statusBar = QStatusBar()
+        self.setStatusBar(self.statusBar)
+        self.imageGeneratorThread = None
 
-setup_logging()
+        # Layout
+        self.layout = QFormLayout()
+        self.layout.addRow("Art Prompt:", self.promptInput)
+        self.layout.addRow("Number of Images:", self.numberInput)
+        self.layout.addRow("Image Size:", self.sizeInput)
+        self.layout.addRow(self.generateButton)
+
+        # Central Widget
+        self.centralWidget = QWidget(self)
+        self.centralWidget.setLayout(self.layout)
+        self.setCentralWidget(self.centralWidget)
+
+        # Create an instance of ImageGallery
+        self.gallery = ImageGallery()
+        self.gallery.hide()  # Hide the gallery initially
+
+    def on_generate_click(self):
+        if self.imageGeneratorThread and self.imageGeneratorThread.isRunning():
+            return
+
+        self.gallery.clear_images()  # Clear previous images from the gallery
+
+        # Create an instance of ImageGenerator and move it to a separate thread
+        self.imageGeneratorThread = ImageGenerator(self.promptInput.text(), int(self.numberInput.currentText()),
+                                                   self.sizeInput.currentText())
+        self.imageGeneratorThread.progressChanged.connect(self.handle_image_generation_progress)
+        self.imageGeneratorThread.finished.connect(self.handle_image_generation_finished)
+        self.imageGeneratorThread.start()
+
+        # Show a loading message or progress indicator while generating images
+        self.statusBar.showMessage("Generating images...")
+
+    def handle_image_generation_progress(self, progress):
+        self.statusBar.showMessage(f"Generating images... Progress: {progress}%")
+
+    def handle_image_generation_finished(self, urls):
+        # Display the generated images in the gallery
+        self.gallery.display_images(urls)
+        self.gallery.show()
+
+        # Reset the loading message or progress indicator
+        self.statusBar.showMessage("Image generation completed.")
+
+    def closeEvent(self, event):
+        if self.imageGeneratorThread and self.imageGeneratorThread.isRunning():
+            self.imageGeneratorThread.quit()
+            self.imageGeneratorThread.wait()
+
+        event.accept()
+
 
 def main():
     # Create the application
-    app = QApplication(sys.argv)
+    app = QApplication([])
 
     # Create and show the main window
     window = ImageGeneratorApp()
     window.show()
 
     # Run the event loop
-    sys.exit(app.exec())
+    app.exec()
+
 
 if __name__ == "__main__":
     main()

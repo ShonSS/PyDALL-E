@@ -1,7 +1,6 @@
-# gallery.py
 import requests
 from PyQt6.QtWidgets import QWidget, QLabel, QGridLayout
-from PyQt6.QtGui import QPixmap
+from PyQt6.QtGui import QPixmap, QColor
 
 
 class ImageGallery(QWidget):
@@ -11,6 +10,8 @@ class ImageGallery(QWidget):
         self.layout = QGridLayout()
         self.setLayout(self.layout)
         self.setWindowTitle('Generated Artwork')
+
+        self.setStyleSheet("background-color: black;")
 
         self.image_labels = []  # Store the labels for the images
 
@@ -44,4 +45,3 @@ class ImageGallery(QWidget):
 
         # Clear the list of image labels
         self.image_labels = []
-
