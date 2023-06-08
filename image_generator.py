@@ -2,30 +2,32 @@ from dotenv import load_dotenv
 import openai
 import os
 from gallery import ImageGallery
+from PyQt6.QtCore import QThread, pyqtSignal
 
-class ImageGenerator:
-    def __init__(self, prompt, num_images, size, status_bar):
+class ImageGenerator(QThread):
+    finished = pyqtSignal(list)
+
+    def __init__(self, prompt, num_images, size):
+        super().__init__()
         self.prompt = prompt
         self.num_images = num_images
         self.size = size
-        self.status_bar = status_bar
-        self.urls = []  # Store the generated image URLs
+        self.urls = []
 
-    def generate_images(self):
+    def run(self):
         load_dotenv()
         openai.api_key = os.getenv("OPENAI_API_KEY")
 
         try:
-            self.status_bar.showMessage(f"Generating {self.num_images} image(s) of size {self.size}...")
             response = openai.Image.create(
                 prompt=self.prompt,
                 n=self.num_images,
                 size=self.size,
                 response_format="url"
             )
-            self.urls = [data["url"] for data in response["data"]]  # Store the generated image URLs
-            self.status_bar.showMessage("Successfully generated images.")
-            self.gallery.display_images(self.urls)
-            self.gallery.show()
+            self.urls = [data["url"] for data in response["data"]]
         except Exception as e:
-            self.status_bar.showMessage(f"An error occurred: {e}")
+            print(f"An error occurred: {e}")
+
+        # Emit the finished signal with the generated image URLs
+        self.finished.emit(self.urls)

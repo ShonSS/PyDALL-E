@@ -1,11 +1,8 @@
-# gui.py
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QLineEdit, QComboBox, QFormLayout, QStatusBar, \
     QMainWindow
-from PyQt6.QtGui import QFont
 from PyQt6.QtCore import Qt
-
-from gallery import ImageGallery
 from image_generator import ImageGenerator
+from gallery import ImageGallery
 
 
 class ImageGeneratorApp(QMainWindow):
@@ -21,8 +18,6 @@ class ImageGeneratorApp(QMainWindow):
         self.sizeInput.addItems(["256x256", "512x512", "1024x1024"])
         self.generateButton = QPushButton("Generate Artwork", self)
         self.generateButton.clicked.connect(self.on_generate_click)
-
-        self.gallery = ImageGallery()
 
         # Status Bar
         self.statusBar = QStatusBar()
@@ -40,14 +35,26 @@ class ImageGeneratorApp(QMainWindow):
         self.centralWidget.setLayout(self.layout)
         self.setCentralWidget(self.centralWidget)
 
+        # Create an instance of ImageGallery
+        self.gallery = ImageGallery()
+        self.gallery.hide()  # Hide the gallery initially
+
     def on_generate_click(self):
         self.gallery.clear_images()  # Clear previous images from the gallery
 
+        # Create an instance of ImageGenerator and move it to a separate thread
         self.image_generator = ImageGenerator(self.promptInput.text(), int(self.numberInput.currentText()),
-                                              self.sizeInput.currentText(), self.statusBar)
-        self.image_generator.gallery = self.gallery  # Pass the gallery instance to ImageGenerator
-        self.image_generator.generate_images()
+                                              self.sizeInput.currentText())
+        self.image_generator.finished.connect(self.handle_image_generation_finished)
+        self.image_generator.start()
 
+        # Show a loading message or progress indicator while generating images
+        self.statusBar.showMessage("Generating images...")
+
+    def handle_image_generation_finished(self, urls):
         # Display the generated images in the gallery
-        self.gallery.display_images(self.image_generator.urls)
+        self.gallery.display_images(urls)
         self.gallery.show()
+
+        # Reset the loading message or progress indicator
+        self.statusBar.clearMessage()
