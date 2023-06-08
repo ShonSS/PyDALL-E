@@ -1,19 +1,18 @@
-from kivy.app import App
-from gui_components import MainLayout
-from api_handler import set_api_key
-from dotenv import load_dotenv
-import os
-from kivy.core.window import Window
+# main.py
+from PyQt6.QtWidgets import QApplication
+from gui import ImageGeneratorApp
+import sys
 
-load_dotenv()
-api_key = os.getenv("OPENAI_API_KEY")
+def main():
+    # Create the application
+    app = QApplication(sys.argv)
 
-class ImageGeneratorApp(App):
-    def build(self):
-        main_layout = MainLayout()
-        self.title = "PyDALL-E"
-        return main_layout
+    # Create and show the main window
+    window = ImageGeneratorApp()
+    window.show()
+
+    # Run the event loop
+    sys.exit(app.exec())
 
 if __name__ == "__main__":
-    set_api_key(api_key)
-    ImageGeneratorApp().run()
+    main()
