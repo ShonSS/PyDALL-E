@@ -10,6 +10,7 @@ class ImageGallery(QWidget):
 
         self.layout = QGridLayout()
         self.setLayout(self.layout)
+        self.setWindowTitle('Generated Artwork')
 
     def display_images(self, urls):
         for i in range(len(urls)):
