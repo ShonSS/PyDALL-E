@@ -8,6 +8,7 @@ from gallery import ImageGallery
 from image_generator import ImageGenerator
 
 
+
 class ImageGeneratorApp(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -85,18 +86,18 @@ class ImageGeneratorApp(QMainWindow):
     def set_dark_mode(self):
         palette = QPalette()
         palette.setColor(QPalette.ColorRole.Window, QColor(53, 53, 53))
-        palette.setColor(QPalette.ColorRole.WindowText, Qt.GlobalColor.White)
+        palette.setColor(QPalette.ColorRole.WindowText, QColor("white"))
         palette.setColor(QPalette.ColorRole.Base, QColor(25, 25, 25))
         palette.setColor(QPalette.ColorRole.AlternateBase, QColor(53, 53, 53))
-        palette.setColor(QPalette.ColorRole.ToolTipBase, Qt.GlobalColor.White)
-        palette.setColor(QPalette.ColorRole.ToolTipText, Qt.GlobalColor.White)
-        palette.setColor(QPalette.ColorRole.Text, Qt.GlobalColor.White)
+        palette.setColor(QPalette.ColorRole.ToolTipBase, QColor("white"))
+        palette.setColor(QPalette.ColorRole.ToolTipText, QColor("white"))
+        palette.setColor(QPalette.ColorRole.Text, QColor("white"))
         palette.setColor(QPalette.ColorRole.Button, QColor(53, 53, 53))
-        palette.setColor(QPalette.ColorRole.ButtonText, Qt.GlobalColor.White)
-        palette.setColor(QPalette.ColorRole.BrightText, Qt.GlobalColor.Red)
+        palette.setColor(QPalette.ColorRole.ButtonText, QColor("white"))
+        palette.setColor(QPalette.ColorRole.BrightText, QColor("red"))
         palette.setColor(QPalette.ColorRole.Link, QColor(42, 130, 218))
         palette.setColor(QPalette.ColorRole.Highlight, QColor(42, 130, 218))
-        palette.setColor(QPalette.ColorRole.HighlightedText, Qt.GlobalColor.Black)
+        palette.setColor(QPalette.ColorRole.HighlightedText, QColor("black"))
         self.setPalette(palette)
 
     def set_light_mode(self):
