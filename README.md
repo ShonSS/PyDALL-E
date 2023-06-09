@@ -71,6 +71,14 @@ An installer will be provided in a future update; until then:
 
 Contributions, bug reports, and feature requests are welcome! Feel free to submit pull requests or report issues to help improve the project.
 
+## Acknowledgements
+
+- [OpenAI](https://openai.com) for their models
+- [PyQt](https://www.riverbankcomputing.com/software/pyqt/) for the GUI framework
+- [PyCharm](https://www.jetbrains.com/pycharm/) for the IDE
+- [Aesthetics Wiki](https://aesthetics.fandom.com/wiki/List_of_Aesthetics) for the list of aesthetics
+
+
 ## License
 
 This project is licensed under the MIT License.
