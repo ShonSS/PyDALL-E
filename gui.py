@@ -4,7 +4,9 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QSizePolicy
 from image_generator import ImageGenerator
 from gallery import ImageGallery
+from data import AESTHETICS
 
+import openai
 
 class ImageGeneratorApp(QMainWindow):
     def __init__(self):
@@ -24,7 +26,9 @@ class ImageGeneratorApp(QMainWindow):
         self.sizeInput = QComboBox(self)
         self.sizeInput.addItems(["256x256", "512x512", "1024x1024"])
         self.generateButton = QPushButton("Generate Artwork", self)
-        self.generateButton.clicked.connect(self.on_generate_click)
+        self.boostButton = QPushButton("Boost Art Prompt", self)
+        self.aestheticsDropdown = QComboBox(self)
+        self.aestheticsDropdown.addItems(AESTHETICS)
 
         # Status Bar
         self.statusBar = QStatusBar()
@@ -32,24 +36,38 @@ class ImageGeneratorApp(QMainWindow):
         self.imageGeneratorThread = None
 
         # Layout
-        self.layout = QFormLayout()
-        self.layout.addRow("Art Prompt:", self.promptInput)
-        self.layout.addRow("Number of Images:", self.numberInput)
-        self.layout.addRow("Image Size:", self.sizeInput)
-        self.layout.addRow(self.generateButton)
-        self.layout.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.AllNonFixedFieldsGrow)
+        layout = QVBoxLayout()
+        centralWidget = QWidget(self)
+        centralWidget.setLayout(layout)
+        self.setCentralWidget(centralWidget)
 
-        # Central Widget
-        self.centralWidget = QWidget(self)
-        self.centralWidget.setLayout(self.layout)
-        self.setCentralWidget(self.centralWidget)
+        formLayout = QFormLayout()
+
+        formLayout.addRow("Art Prompt:", self.promptInput)
+        formLayout.addRow(self.boostButton)
+        formLayout.addRow("Aesthetics:", self.aestheticsDropdown)
+        formLayout.addRow("Number of Images:", self.numberInput)
+        formLayout.addRow("Image Size:", self.sizeInput)
+        formLayout.addRow(self.generateButton)
+        layout.addLayout(formLayout)
 
         # Create an instance of ImageGallery
         self.gallery = ImageGallery()
         self.gallery.hide()  # Hide the gallery initially
 
         # Set the central widget's layout properties
-        self.centralWidget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        centralWidget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+
+        # Connect the buttons to their event handlers
+        self.boostButton.clicked.connect(self.on_boost_prompt_click)
+        self.generateButton.clicked.connect(self.on_generate_click)
+
+    def on_boost_prompt_click(self):
+        prompt = self.promptInput.toPlainText()
+
+        # Call OpenAI to boost the art prompt and update the prompt input
+        boosted_prompt = self.boost_art_prompt(prompt)
+        self.promptInput.setPlainText(boosted_prompt)
 
     def on_generate_click(self):
         if self.imageGeneratorThread and self.imageGeneratorThread.isRunning():
@@ -84,6 +102,29 @@ class ImageGeneratorApp(QMainWindow):
         # Reset the loading message or progress indicator
         self.statusBar.clearMessage()
 
+    def boost_art_prompt(self, prompt):
+        # Define the boost instruction
+        boost_instruction = "Craft an art prompt for DALL-E by transforming the following text into a powerful catalyst for awe-inspiring art:"
+
+        # Combine the boost instruction with the existing prompt
+        combined_prompt = f"{boost_instruction} {prompt}"
+
+        # Use OpenAI to rewrite the art prompt and engineer the best prompt
+        # You can customize this logic according to your requirements
+        boosted_prompt = openai.Completion.create(
+            engine="text-davinci-003",
+            prompt=combined_prompt,
+            max_tokens=100,
+            n=1,
+            stop=None,
+            temperature=1.0,
+            top_p=1.0,
+            frequency_penalty=0.0,
+            presence_penalty=0.0
+        ).choices[0].text.strip()
+
+        return boosted_prompt
+
     def set_dark_mode(self):
         palette = QPalette()
         palette.setColor(QPalette.ColorRole.Window, QColor(53, 53, 53))
@@ -117,4 +158,4 @@ class ImageGeneratorApp(QMainWindow):
         layout.addWidget(full_image_label)
 
         full_image_dialog.setLayout(layout)
-        full_image_dialog.exec()
+        full_image_dialog.exec_()
