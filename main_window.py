@@ -1,12 +1,12 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QPlainTextEdit, QComboBox, QFormLayout, QStatusBar, QMainWindow, QDialog
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QPlainTextEdit, QComboBox, QFormLayout, \
+    QStatusBar, QMainWindow, QDialog, QSizePolicy
 from PyQt6.QtGui import QPalette, QColor, QPixmap, QGuiApplication
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QSizePolicy
 from image_generator import ImageGenerator
 from gallery import ImageGallery
 from data import AESTHETICS
-
-import openai
+from boost_art_prompt_thread import BoostArtPromptThread
+from themes import set_dark_mode, set_light_mode
 
 class ImageGeneratorApp(QMainWindow):
     def __init__(self):
@@ -15,9 +15,9 @@ class ImageGeneratorApp(QMainWindow):
 
         # Set dark mode or light mode based on the system setting
         if QGuiApplication.palette().color(QPalette.ColorRole.Window).value() > 128:
-            self.set_light_mode()
+            set_light_mode(self)
         else:
-            self.set_dark_mode()
+            set_dark_mode(self)
 
         # UI Elements
         self.promptInput = QPlainTextEdit(self)
@@ -34,6 +34,9 @@ class ImageGeneratorApp(QMainWindow):
         self.statusBar = QStatusBar()
         self.setStatusBar(self.statusBar)
         self.imageGeneratorThread = None
+
+        # Initialize the BoostArtPromptThread
+        self.boostArtPromptThread = None
 
         # Layout
         layout = QVBoxLayout()
@@ -63,10 +66,15 @@ class ImageGeneratorApp(QMainWindow):
         self.generateButton.clicked.connect(self.on_generate_click)
 
     def on_boost_prompt_click(self):
-        prompt = self.promptInput.toPlainText()
+        if self.boostArtPromptThread and self.boostArtPromptThread.isRunning():
+            return
 
-        # Call OpenAI to boost the art prompt and update the prompt input
-        boosted_prompt = self.boost_art_prompt(prompt)
+        # Instantiate BoostArtPromptThread and begin execution
+        self.boostArtPromptThread = BoostArtPromptThread(self.promptInput.toPlainText())
+        self.boostArtPromptThread.promptBoosted.connect(self.update_prompt_input)
+        self.boostArtPromptThread.start()
+
+    def update_prompt_input(self, boosted_prompt):
         self.promptInput.setPlainText(boosted_prompt)
 
     def on_generate_click(self):
@@ -102,29 +110,6 @@ class ImageGeneratorApp(QMainWindow):
         # Reset the loading message or progress indicator
         self.statusBar.clearMessage()
 
-    def boost_art_prompt(self, prompt):
-        # Define the boost instruction
-        boost_instruction = "Craft an art prompt for DALL-E by transforming the following text into a powerful catalyst for awe-inspiring art:"
-
-        # Combine the boost instruction with the existing prompt
-        combined_prompt = f"{boost_instruction} {prompt}"
-
-        # Use OpenAI to rewrite the art prompt and engineer the best prompt
-        # You can customize this logic according to your requirements
-        boosted_prompt = openai.Completion.create(
-            engine="text-davinci-003",
-            prompt=combined_prompt,
-            max_tokens=100,
-            n=1,
-            stop=None,
-            temperature=1.0,
-            top_p=1.0,
-            frequency_penalty=0.0,
-            presence_penalty=0.0
-        ).choices[0].text.strip()
-
-        return boosted_prompt
-
     def set_dark_mode(self):
         palette = QPalette()
         palette.setColor(QPalette.ColorRole.Window, QColor(53, 53, 53))
@@ -145,17 +130,3 @@ class ImageGeneratorApp(QMainWindow):
     def set_light_mode(self):
         # Reset to the default palette for light mode
         self.setPalette(QGuiApplication.palette())
-
-    def show_full_image(self, pixmap):
-        full_image_dialog = QDialog(self)
-        full_image_dialog.setWindowTitle("Full Size Image")
-
-        full_image_label = QLabel()
-        full_image_label.setPixmap(pixmap)
-        full_image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        layout = QVBoxLayout()
-        layout.addWidget(full_image_label)
-
-        full_image_dialog.setLayout(layout)
-        full_image_dialog.exec_()

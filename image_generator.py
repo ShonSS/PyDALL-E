@@ -1,4 +1,5 @@
 # image_generator.py
+
 from dotenv import load_dotenv
 import openai
 import os

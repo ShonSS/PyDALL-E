@@ -1,6 +1,6 @@
 import openai
 from PyQt6.QtWidgets import QApplication
-from gui import ImageGeneratorApp
+from main_window import ImageGeneratorApp
 import os
 from dotenv import load_dotenv
 
@@ -23,7 +23,6 @@ def main():
 
     # Run the event loop
     app.exec()
-
 
 if __name__ == "__main__":
     main()
