@@ -73,7 +73,7 @@ Contributions, bug reports, and feature requests are welcome! Feel free to submi
 
 ## Acknowledgements
 
-- [OpenAI](https://openai.com) for their models
+- [OpenAI](https://openai.com) for their coding assistance and models
 - [The DALL·E 2 Prompt Book](https://dallery.gallery/the-dalle-2-prompt-book/) for inspiration and art prompt ideas
 - [PyQt](https://www.riverbankcomputing.com/software/pyqt/) for the GUI framework
 - [PyCharm](https://www.jetbrains.com/pycharm/) for the IDE
