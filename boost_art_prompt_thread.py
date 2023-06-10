@@ -3,6 +3,7 @@ import openai
 
 class BoostArtPromptThread(QThread):
     promptBoosted = pyqtSignal(str)
+    progressChanged = pyqtSignal(int)  # Add this line
 
     def __init__(self, prompt, selected_aesthetic):
         super().__init__()
@@ -11,6 +12,7 @@ class BoostArtPromptThread(QThread):
 
     def run(self):
         boosted_prompt = self.boost_art_prompt(self.prompt, self.selected_aesthetic)
+        self.progressChanged.emit(100)  # Simulate progress completion
         self.promptBoosted.emit(boosted_prompt)
 
     def boost_art_prompt(self, prompt, selected_aesthetic):
