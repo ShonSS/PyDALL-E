@@ -3,7 +3,7 @@ import openai
 
 class BoostArtPromptThread(QThread):
     promptBoosted = pyqtSignal(str)
-    progressChanged = pyqtSignal(int)  # Add this line
+    progressChanged = pyqtSignal(int)
 
     def __init__(self, prompt, selected_aesthetic):
         super().__init__()
@@ -26,7 +26,6 @@ class BoostArtPromptThread(QThread):
         combined_prompt = f"{boost_instruction} {prompt}"
 
         # Use OpenAI to rewrite the art prompt and engineer the best prompt
-        # You can customize this logic according to your requirements
         boosted_prompt = openai.Completion.create(
             engine="text-davinci-003",
             prompt=combined_prompt,

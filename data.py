@@ -1,5 +1,3 @@
-# data.py:
-
 AESTHETICS = ["1950's Suburbia", "2-Tone", "2000's Autumn", "2010s Internet", "2014-era tumblr",
               "2014 Girly Tumblr", "2020 Alt", "2K1", "2K7", "80s Ballroom", "80s Heart-Throb",
               "Abstract Tech", "Acid Pixie", "Acidwave", "Acubi", "Adventurecore", "Adventure Pulp",

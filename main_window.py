@@ -20,7 +20,7 @@ class ImageGeneratorApp(QMainWindow):
 
         # UI Elements
         self.promptInput = QPlainTextEdit(self)
-        self.placeholderText = 'Describe your imagination... Boost it, select parameters, then create your art...'
+        self.placeholderText = 'Imagine your artistic vision, experiment with rich styles and elements, and let your creativity soar...'
         self.promptInput.setPlaceholderText(self.placeholderText)
         self.numberInput = QComboBox(self)
         self.numberInput.addItems([str(i) for i in range(1, 11)])  # for example 1-10 images
@@ -135,4 +135,4 @@ class ImageGeneratorApp(QMainWindow):
     def handle_boost_prompt_finished(self):
         # Reset the progress bar and the status bar when the processing is finished
         self.progressBar.setValue(100)
-        self.statusBar.showMessage("Art prompt boosting completed.", 10000)  # Display for 10 seconds
+        self.statusBar.showMessage("Art prompt boosting completed.", 10000)
