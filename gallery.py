@@ -1,4 +1,5 @@
 import requests
+from functools import partial
 from PyQt6.QtWidgets import QWidget, QLabel, QGridLayout
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt, pyqtSignal
@@ -48,7 +49,7 @@ class ImageGallery(QWidget):
             label.setPixmap(thumbnail)
             label.setCursor(Qt.CursorShape.PointingHandCursor)
             label.setObjectName(f"thumbnail_{i}")
-            label.clicked.connect(lambda checked, label=label: self.handle_image_clicked(label))
+            label.clicked.connect(partial(self.handle_image_clicked, label))
 
             # Add the ClickableLabel to the layout
             row = i // 3  # 3 images per row

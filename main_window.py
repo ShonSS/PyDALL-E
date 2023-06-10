@@ -1,3 +1,5 @@
+# main_window.py
+import logging
 from PyQt6.QtGui import QPalette, QGuiApplication
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QPlainTextEdit, QComboBox, QFormLayout, \
     QStatusBar, QMainWindow, QSizePolicy, QProgressBar
@@ -6,6 +8,9 @@ from data import AESTHETICS
 from gallery import ImageGallery
 from image_generator import ImageGenerator
 from themes import set_dark_mode, set_light_mode
+
+# Add logging at the start of the file
+logging.getLogger(__name__)
 
 class ImageGeneratorApp(QMainWindow):
     def __init__(self):
@@ -75,6 +80,7 @@ class ImageGeneratorApp(QMainWindow):
         self.generateButton.clicked.connect(self.on_generate_click)
 
     def on_boost_prompt_click(self):
+        logging.info("Boost Art Prompt button clicked")
         if self.boostArtPromptThread and self.boostArtPromptThread.isRunning():
             return
 
@@ -91,12 +97,15 @@ class ImageGeneratorApp(QMainWindow):
         self.statusBar.showMessage("Boosting art prompt...")
 
     def handle_boost_prompt_progress(self, progress):
+        logging.debug("Boost Art Prompt progress: %d", progress)
         self.progressBar.setValue(progress)
 
     def update_prompt_input(self, boosted_prompt):
+        logging.info("Updated art prompt with boosted version")
         self.promptInput.setPlainText(boosted_prompt)
 
     def on_generate_click(self):
+        logging.info("Generate Art button clicked")
         if self.imageGeneratorThread and self.imageGeneratorThread.isRunning():
             return
 
@@ -120,10 +129,12 @@ class ImageGeneratorApp(QMainWindow):
         self.statusBar.showMessage("Generating images...")
 
     def handle_image_generation_progress(self, progress):
+        logging.debug("Image generation progress: %d", progress)
         self.progressBar.setValue(progress)
         self.statusBar.showMessage(f"Generating images... Progress: {progress}%")
 
     def handle_image_generation_finished(self, urls):
+        logging.info("Image generation finished")
         # Display the generated images in the gallery
         self.gallery.display_images(urls)
         self.gallery.show()
@@ -133,6 +144,7 @@ class ImageGeneratorApp(QMainWindow):
         self.statusBar.showMessage("Image generation completed.", 10000)  # Display for 10 seconds
 
     def handle_boost_prompt_finished(self):
+        logging.info("Art prompt boosting finished")
         # Reset the progress bar and the status bar when the processing is finished
         self.progressBar.setValue(100)
         self.statusBar.showMessage("Art prompt boosting completed.", 10000)
