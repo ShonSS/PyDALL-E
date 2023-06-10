@@ -53,11 +53,11 @@ An installer will be provided in a future update; until then:
 ## Usage
 
 1. Run the application: `python main.py`
-2. Enter a brief description in the text box.
-3. Use the "Boost Art Prompt" button to augment, optionally selecting an aesthetic from the dropdown.
-4. Configure the number of images (1-10) and the image size (256x256, 512x512, 1024x1024).
-5. Click the "Generate Artwork" button to generate and display the images in a separate gallery.
-6. The status and progress bars at the bottom update as the images are being generated.
+2. Enter a brief description in the text box that captures your imagination.
+3. Use the "Boost Art Prompt" button to augment your idea, optionally selecting an aesthetic from the dropdown to refine the artistic style.
+4. Configure the number of images (1-10) and the image size (256x256, 512x512, 1024x1024) to bring your vision to life.
+5. Click the "Generate Artwork" button to create and display the images in a separate gallery, unveiling the AI-powered masterpieces.
+6. The status and progress bars at the bottom keep you informed as your images are being generated.
 
 ## Known Issues
 
@@ -70,8 +70,6 @@ An installer will be provided in a future update; until then:
 - GUI performance tuning
 - GUI UI/UX enhancements
 - AI Completion refinements
-- More logging and better error handling
-- Reset button
 
 ## Contributing
 
