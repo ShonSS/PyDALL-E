@@ -1,5 +1,7 @@
 # PyDALL-E
 
+![img.png](img.png)
+
 PyDALL-E is a Python-based GUI application that allows users to generate images from textual descriptions using OpenAI's DALL-E API. The application is built with PyQt6, providing a user-friendly interface and leveraging multithreading for a responsive user experience.
 
 ## Features
