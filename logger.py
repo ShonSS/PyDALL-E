@@ -1,7 +1,6 @@
 import logging
 from logging.handlers import TimedRotatingFileHandler
 
-# logger.py
 
 def setup_logger(name):
     logger = logging.getLogger(name)
