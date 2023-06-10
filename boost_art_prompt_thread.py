@@ -4,17 +4,21 @@ import openai
 class BoostArtPromptThread(QThread):
     promptBoosted = pyqtSignal(str)
 
-    def __init__(self, prompt):
+    def __init__(self, prompt, selected_aesthetic):
         super().__init__()
         self.prompt = prompt
+        self.selected_aesthetic = selected_aesthetic
 
     def run(self):
-        boosted_prompt = self.boost_art_prompt(self.prompt)
+        boosted_prompt = self.boost_art_prompt(self.prompt, self.selected_aesthetic)
         self.promptBoosted.emit(boosted_prompt)
 
-    def boost_art_prompt(self, prompt):
-        # Define the boost instruction
-        boost_instruction = "Craft an art prompt for DALL-E by transforming the following text into a powerful catalyst for awe-inspiring art:"
+    def boost_art_prompt(self, prompt, selected_aesthetic):
+        # Define the boost instruction with the selected aesthetic if available
+        if selected_aesthetic:
+            boost_instruction = f"Craft an art prompt for DALL-E by transforming the following text into a powerful catalyst for awe-inspiring {selected_aesthetic} art:"
+        else:
+            boost_instruction = "Craft an art prompt for DALL-E by transforming the following text into a powerful catalyst for awe-inspiring art:"
 
         # Combine the boost instruction with the existing prompt
         combined_prompt = f"{boost_instruction} {prompt}"

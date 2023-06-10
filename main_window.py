@@ -30,6 +30,7 @@ class ImageGeneratorApp(QMainWindow):
         self.generateButton = QPushButton("Generate Artwork", self)
         self.boostButton = QPushButton("Boost Art Prompt", self)
         self.aestheticsDropdown = QComboBox(self)
+        self.aestheticsDropdown.addItem("")
         self.aestheticsDropdown.addItems(AESTHETICS)
 
         # Status Bar
@@ -72,18 +73,14 @@ class ImageGeneratorApp(QMainWindow):
             return
 
         # Instantiate BoostArtPromptThread and begin execution
-        self.boostArtPromptThread = BoostArtPromptThread(self.promptInput.toPlainText())
+        selected_aesthetic = self.aestheticsDropdown.currentText()
+        self.boostArtPromptThread = BoostArtPromptThread(self.promptInput.toPlainText(), selected_aesthetic)
         self.boostArtPromptThread.promptBoosted.connect(self.update_prompt_input)
         self.boostArtPromptThread.finished.connect(self.handle_boost_prompt_finished)
         self.boostArtPromptThread.start()
 
         # Update the status bar while boosting the art prompt
         self.statusBar.showMessage("Boosting art prompt...")
-
-    # Add this new event handler at the end of ImageGeneratorApp class
-    def handle_boost_prompt_finished(self):
-        # Reset the status bar message when the processing is finished
-        self.statusBar.clearMessage()
 
     def update_prompt_input(self, boosted_prompt):
         self.promptInput.setPlainText(boosted_prompt)
@@ -118,30 +115,9 @@ class ImageGeneratorApp(QMainWindow):
         self.gallery.display_images(urls)
         self.gallery.show()
 
-        # Show completion message
+        # Reset the loading message or progress indicator
         self.statusBar.showMessage("Image generation completed.", 5000)  # Display for 5 seconds
 
     def handle_boost_prompt_finished(self):
         # Reset the status bar message when the processing is finished
         self.statusBar.showMessage("Art prompt boosting completed.", 5000)  # Display for 5 seconds
-
-    def set_dark_mode(self):
-        palette = QPalette()
-        palette.setColor(QPalette.ColorRole.Window, QColor(53, 53, 53))
-        palette.setColor(QPalette.ColorRole.WindowText, QColor("white"))
-        palette.setColor(QPalette.ColorRole.Base, QColor(25, 25, 25))
-        palette.setColor(QPalette.ColorRole.AlternateBase, QColor(53, 53, 53))
-        palette.setColor(QPalette.ColorRole.ToolTipBase, QColor("white"))
-        palette.setColor(QPalette.ColorRole.ToolTipText, QColor("white"))
-        palette.setColor(QPalette.ColorRole.Text, QColor("white"))
-        palette.setColor(QPalette.ColorRole.Button, QColor(53, 53, 53))
-        palette.setColor(QPalette.ColorRole.ButtonText, QColor("white"))
-        palette.setColor(QPalette.ColorRole.BrightText, QColor("red"))
-        palette.setColor(QPalette.ColorRole.Link, QColor(42, 130, 218))
-        palette.setColor(QPalette.ColorRole.Highlight, QColor(42, 130, 218))
-        palette.setColor(QPalette.ColorRole.HighlightedText, QColor("black"))
-        self.setPalette(palette)
-
-    def set_light_mode(self):
-        # Reset to the default palette for light mode
-        self.setPalette(QGuiApplication.palette())
