@@ -69,7 +69,7 @@ class ImageGeneratorApp(QMainWindow):
         self.generateButton.clicked.connect(self.on_generate_click)
 
     def on_boost_prompt_click(self):
-        if self.boostArtPromptThread and self.boostArtPromptThread.isRunning():
+        if self.boostArtPromptThread and self.boostArtPromptThread.isRunning():  # Corrected attribute name
             return
 
         # Instantiate BoostArtPromptThread and begin execution
@@ -116,8 +116,8 @@ class ImageGeneratorApp(QMainWindow):
         self.gallery.show()
 
         # Reset the loading message or progress indicator
-        self.statusBar.showMessage("Image generation completed.", 5000)  # Display for 5 seconds
+        self.statusBar.showMessage("Image generation completed.", 10000)  # Display for 5 seconds
 
     def handle_boost_prompt_finished(self):
         # Reset the status bar message when the processing is finished
-        self.statusBar.showMessage("Art prompt boosting completed.", 5000)  # Display for 5 seconds
+        self.statusBar.showMessage("Art prompt boosting completed.", 10000)  # Display for 5 seconds
