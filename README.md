@@ -8,6 +8,8 @@ PyDALL-E is a Python-based GUI application that allows users to generate images 
 
 - User-friendly interface with responsive design
 - Generate images based on text descriptions
+- AI prompt boosting for better image generation
+- Aesthetic selector to refine generated art
 - Customize the number of images and image size
 - Asynchronous API requests for a smooth user experience
 - Display generated images in a gallery layout
@@ -60,6 +62,7 @@ An installer will be provided in a future update; until then:
 ## Known Issues
 
 - GUI refinements and Image gallery are currently under development.
+- Lack of an installer, planned for a future update.
 
 ## Future Features
 
