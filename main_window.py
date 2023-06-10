@@ -21,6 +21,8 @@ class ImageGeneratorApp(QMainWindow):
 
         # UI Elements
         self.promptInput = QPlainTextEdit(self)
+        self.placeholderText = 'Describe your imagination... Boost it, select parameters, then create your art...'
+        self.promptInput.setPlaceholderText(self.placeholderText)
         self.numberInput = QComboBox(self)
         self.numberInput.addItems([str(i) for i in range(1, 11)])  # for example 1-10 images
         self.sizeInput = QComboBox(self)
@@ -72,7 +74,16 @@ class ImageGeneratorApp(QMainWindow):
         # Instantiate BoostArtPromptThread and begin execution
         self.boostArtPromptThread = BoostArtPromptThread(self.promptInput.toPlainText())
         self.boostArtPromptThread.promptBoosted.connect(self.update_prompt_input)
+        self.boostArtPromptThread.finished.connect(self.handle_boost_prompt_finished)
         self.boostArtPromptThread.start()
+
+        # Update the status bar while boosting the art prompt
+        self.statusBar.showMessage("Boosting art prompt...")
+
+    # Add this new event handler at the end of ImageGeneratorApp class
+    def handle_boost_prompt_finished(self):
+        # Reset the status bar message when the processing is finished
+        self.statusBar.clearMessage()
 
     def update_prompt_input(self, boosted_prompt):
         self.promptInput.setPlainText(boosted_prompt)
@@ -107,8 +118,12 @@ class ImageGeneratorApp(QMainWindow):
         self.gallery.display_images(urls)
         self.gallery.show()
 
-        # Reset the loading message or progress indicator
-        self.statusBar.clearMessage()
+        # Show completion message
+        self.statusBar.showMessage("Image generation completed.", 5000)  # Display for 5 seconds
+
+    def handle_boost_prompt_finished(self):
+        # Reset the status bar message when the processing is finished
+        self.statusBar.showMessage("Art prompt boosting completed.", 5000)  # Display for 5 seconds
 
     def set_dark_mode(self):
         palette = QPalette()
