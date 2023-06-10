@@ -2,7 +2,7 @@
 
 ![img.png](img.png)
 
-PyDALL-E is a groundbreaking Python-based GUI application that fuses the power of your imagination and OpenAI's state-of-the-art DALL-E API to transform textual descriptions into spellbinding visual art. The app harnesses PyQt6 to deliver an intuitive, user-centric interface, and embraces multithreading for a seamless, engaging, and responsive user experience.
+PyDALL-E is a Python-based GUI application that fuses the power of your imagination and OpenAI's state-of-the-art DALL-E API to transform textual descriptions into spellbinding visual art. The app harnesses PyQt6 to deliver an intuitive, user-centric interface, and embraces multithreading for a seamless, engaging, and responsive user experience.
 
 Explore AI-powered art generation like never before with features such as AI prompt boosting for superior image generation, an aesthetic selector to refine your creations, and a gallery layout to display your masterpieces. Exciting enhancements on the horizon include upgraded art prompt design processes, performance tuning, UI/UX improvements, and AI completion refinements.
 
