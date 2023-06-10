@@ -51,23 +51,24 @@ An installer will be provided in a future update; until then:
 ## Usage
 
 1. Run the application: `python main.py`
-
-2. Enter a description in the text box.
-
-3. Configure the number of images (1-10) and the image size (256x256, 512x512, 1024x1024).
-
-4. Click the "Create Art" button to generate and display the images based on the given description.
-
-5. The progress bar at the bottom updates as the images are being loaded.
+2. Enter a brief description in the text box.
+3. Use the "Boost Art Prompt" button to augment, optionally selecting an aesthetic from the dropdown.
+4. Configure the number of images (1-10) and the image size (256x256, 512x512, 1024x1024).
+5. Click the "Generate Artwork" button to generate and display the images in a separate gallery.
+6. The status and progress bars at the bottom update as the images are being generated.
 
 ## Known Issues
 
-- Interacting with the generated art may cause the application to crash. The image gallery is currently under development and will be addressed in future updates.
+- GUI refinements and Image gallery are currently under development.
 
 ## Future Features
 
-- AI-powered art prompt design and engineering to make the art pop
-- GUI upgrades to enhance the art prompt design process to boost the quality of the generated art
+- Upgraded art prompt design process to boost the quality of the generated art, such as more dropdowns to specify art parameters based on the DALL-E Prompt Book.
+- GUI performance tuning
+- GUI UI/UX enhancements
+- AI Completion refinements
+- More logging and better error handling
+- Reset button
 
 ## Contributing
 
