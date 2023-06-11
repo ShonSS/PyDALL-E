@@ -5,6 +5,8 @@ import logging
 from main_window import ImageGeneratorApp
 import os
 from dotenv import load_dotenv
+from PyQt6.QtGui import QGuiApplication, QColor, QPalette
+from qt_material import apply_stylesheet
 
 # Configure logging settings
 logging.basicConfig(
@@ -29,6 +31,16 @@ def main():
 
     # Create the application
     app = QApplication([])
+
+    # Get the current window color from the system palette
+    default_color = QGuiApplication.palette().color(QPalette.ColorRole.Window)
+
+    # Select a theme based on the lightness of the default window color
+    if default_color.lightness() > 128:
+        apply_stylesheet(app, theme='light_purple.xml')
+    else:
+        apply_stylesheet(app, theme='dark_purple.xml')
+
     logging.info("Application created")
 
     # Create and show the main window

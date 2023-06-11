@@ -1,6 +1,5 @@
-# boost_art_prompt_thread.py contains the BoostArtPromptThread class, which is a QThread that boosts an art prompt
-import logging
 # boost_art_prompt_thread.py
+import logging
 from PyQt6.QtCore import QThread, pyqtSignal
 import openai
 

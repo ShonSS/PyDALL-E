@@ -1,3 +1,4 @@
+# image_generator.py
 import logging
 import openai
 from PyQt6.QtCore import QThread, pyqtSignal
