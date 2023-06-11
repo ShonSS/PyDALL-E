@@ -1,3 +1,4 @@
+# themes.py
 from PyQt6.QtGui import QPalette, QColor, QGuiApplication
 
 

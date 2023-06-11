@@ -1,5 +1,6 @@
 # main_window.py
 import logging
+# main_window.py
 from PyQt6.QtGui import QPalette, QGuiApplication
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QPlainTextEdit, QComboBox, QFormLayout, \
     QStatusBar, QMainWindow, QSizePolicy, QProgressBar
