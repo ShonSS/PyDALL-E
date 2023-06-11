@@ -1,5 +1,6 @@
 from PyQt6.QtGui import QPalette, QColor, QGuiApplication
 
+
 def set_dark_mode(window):
     palette = QPalette()
     palette.setColor(QPalette.ColorRole.Window, QColor(53, 53, 53))
@@ -16,6 +17,7 @@ def set_dark_mode(window):
     palette.setColor(QPalette.ColorRole.Highlight, QColor(42, 130, 218))
     palette.setColor(QPalette.ColorRole.HighlightedText, QColor("black"))
     window.setPalette(palette)
+
 
 def set_light_mode(window):
     # Reset to the default palette for light mode
