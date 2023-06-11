@@ -1,9 +1,8 @@
 # main_window.py
 import logging
-# main_window.py
-from PyQt6.QtGui import QPalette, QGuiApplication
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QPlainTextEdit, QComboBox, QFormLayout, \
-    QStatusBar, QMainWindow, QSizePolicy, QProgressBar
+from PyQt6.QtGui import QPalette, QGuiApplication, QImage, QPixmap
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QPlainTextEdit, QComboBox, QFormLayout, \
+    QStatusBar, QMainWindow, QSizePolicy, QProgressBar, QDial, QLCDNumber
 from boost_art_prompt_thread import BoostArtPromptThread
 from data import AESTHETICS
 from gallery import ImageGallery
@@ -26,17 +25,32 @@ class ImageGeneratorApp(QMainWindow):
 
         # UI Elements
         self.promptInput = QPlainTextEdit(self)
-        self.placeholderText = 'Imagine your artistic vision, experiment with rich styles and elements, and let your creativity soar...'
+        self.placeholderText = 'Craft your art prompt... Imagine your artistic vision and let AI assist you in exploring rich styles and elements. Click "Boost Art Prompt" to unleash your creativity!'
         self.promptInput.setPlaceholderText(self.placeholderText)
-        self.numberInput = QComboBox(self)
-        self.numberInput.addItems([str(i) for i in range(1, 11)])  # for example 1-10 images
-        self.sizeInput = QComboBox(self)
-        self.sizeInput.addItems(["256x256", "512x512", "1024x1024"])
+
+        # QDial and QLCDNumber for number of images
+        self.imageNumberDial = QDial()
+        self.imageNumberDial.setNotchesVisible(True)
+        self.imageNumberDial.setRange(1, 10)
+        self.imageNumberDisplay = QLCDNumber()
+        self.imageNumberDisplay.setDigitCount(2)
+        self.imageNumberDisplay.display(1)  # Set default value to 1
+
+        # QDial and QLCDNumber for image size
+        self.imageSizeDial = QDial()
+        self.imageSizeDial.setNotchesVisible(True)
+        self.imageSizeDial.setRange(1, 3)
+        self.imageSizeDisplay = QLCDNumber()
+        self.imageSizeDisplay.setDigitCount(4)
+        self.imageSizeDisplay.display("256x256")  # Set default value to 256
+
         self.generateButton = QPushButton("Generate Artwork", self)
         self.boostButton = QPushButton("Boost Art Prompt", self)
         self.aestheticsDropdown = QComboBox(self)
         self.aestheticsDropdown.addItem("")
         self.aestheticsDropdown.addItems(AESTHETICS)
+
+        self.selected_aesthetic = None  # Initialize the selected_aesthetic attribute
 
         # Progress Bar
         self.progressBar = QProgressBar()
@@ -58,11 +72,22 @@ class ImageGeneratorApp(QMainWindow):
 
         formLayout = QFormLayout()
 
-        formLayout.addRow("Art Prompt:", self.promptInput)
+        formLayout.addRow(self.aestheticsDropdown)
+        formLayout.addRow(self.promptInput)
         formLayout.addRow(self.boostButton)
-        formLayout.addRow("Aesthetics:", self.aestheticsDropdown)
-        formLayout.addRow("Number of Images:", self.numberInput)
-        formLayout.addRow("Image Size:", self.sizeInput)
+
+        # Add QDial and QLCDNumber for number of images
+        numberLayout = QHBoxLayout()
+        numberLayout.addWidget(self.imageNumberDial)
+        numberLayout.addWidget(self.imageNumberDisplay)
+        formLayout.addRow(numberLayout)
+
+        # Add QDial and QLCDNumber for image size
+        sizeLayout = QHBoxLayout()
+        sizeLayout.addWidget(self.imageSizeDial)
+        sizeLayout.addWidget(self.imageSizeDisplay)
+        formLayout.addRow(sizeLayout)
+
         formLayout.addRow(self.generateButton)
         layout.addLayout(formLayout)
 
@@ -71,81 +96,71 @@ class ImageGeneratorApp(QMainWindow):
 
         # Create an instance of ImageGallery
         self.gallery = ImageGallery()
-        self.gallery.hide()  # Hide the gallery initially
+        layout.addWidget(self.gallery)
 
-        # Set the central widget's layout properties
-        centralWidget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        # Connect QDials and LCD displays
+        self.imageSizeDial.valueChanged.connect(self.update_image_size_display)
+        self.imageNumberDial.valueChanged.connect(self.update_image_number_display)
 
-        # Connect the buttons to their event handlers
-        self.boostButton.clicked.connect(self.on_boost_prompt_click)
-        self.generateButton.clicked.connect(self.on_generate_click)
+        # Connect buttons to methods
+        self.generateButton.clicked.connect(self.generate_images)
+        self.boostButton.clicked.connect(self.boost_prompt)
 
-    def on_boost_prompt_click(self):
-        logging.info("Boost Art Prompt button clicked")
-        if self.boostArtPromptThread and self.boostArtPromptThread.isRunning():
-            return
+    def generate_images(self):
+        """ Generates images based on the current input parameters """
+        art_prompt = self.promptInput.toPlainText()
+        aesthetics = self.aestheticsDropdown.currentText()
+        num_images = self.imageNumberDial.value()
+        image_size = self.imageSizeDisplay.value()  # Get actual image size from imageSizeDisplay
 
-        # Instantiate BoostArtPromptThread and begin execution
-        selected_aesthetic = self.aestheticsDropdown.currentText()
-        self.boostArtPromptThread = BoostArtPromptThread(self.promptInput.toPlainText(), selected_aesthetic)
-        self.boostArtPromptThread.promptBoosted.connect(self.update_prompt_input)
-        self.boostArtPromptThread.finished.connect(self.handle_boost_prompt_finished)
-        self.boostArtPromptThread.progressChanged.connect(self.handle_boost_prompt_progress)  # Connect progressChanged
-        self.boostArtPromptThread.start()
+        # If no aesthetics is selected, default to 'none'
+        if not aesthetics:
+            aesthetics = 'none'
 
-        # Initialize the progress bar and the status bar
-        self.progressBar.setValue(0)
-        self.statusBar.showMessage("Boosting art prompt...")
+        # Clear the UI and update the status bar
+        self.gallery.clear_images()
+        self.statusBar.showMessage("Generating Artwork...")
 
-    def handle_boost_prompt_progress(self, progress):
-        logging.debug("Boost Art Prompt progress: %d", progress)
-        self.progressBar.setValue(progress)
-
-    def update_prompt_input(self, boosted_prompt):
-        logging.info("Updated art prompt with boosted version")
-        self.promptInput.setPlainText(boosted_prompt)
-
-    def on_generate_click(self):
-        logging.info("Generate Art button clicked")
-        if self.imageGeneratorThread and self.imageGeneratorThread.isRunning():
-            return
-
-        # Destroy the previous image gallery
-        self.gallery.deleteLater()
-
-        self.gallery = ImageGallery()  # Create a new instance of ImageGallery
-        self.gallery.hide()  # Hide the gallery initially
-
-        self.gallery.clear_images()  # Clear previous images from the gallery
-
-        # Create an instance of ImageGenerator and move it to a separate thread
-        self.imageGeneratorThread = ImageGenerator(self.promptInput.toPlainText(),
-                                                   int(self.numberInput.currentText()), self.sizeInput.currentText())
-        self.imageGeneratorThread.progressChanged.connect(self.handle_image_generation_progress)
-        self.imageGeneratorThread.finished.connect(self.handle_image_generation_finished)
+        # Create an instance of ImageGenerator and start the thread
+        self.imageGeneratorThread = ImageGenerator(art_prompt, num_images, image_size, aesthetics)
+        self.imageGeneratorThread.progressChanged.connect(self.progressBar.setValue)
+        self.imageGeneratorThread.finished.connect(self.on_image_generation_finished)
+        self.imageGeneratorThread.finished.connect(self.display_images)  # Connect finished signal to display_images
         self.imageGeneratorThread.start()
 
-        # Initialize the progress bar and the status bar
-        self.progressBar.setValue(0)
-        self.statusBar.showMessage("Generating images...")
+    def display_images(self):
+        """ Create a new ImageGallery, add images to it and display it """
+        self.gallery = ImageGallery()  # Create a new ImageGallery
+        self.gallery.display_images(self.imageGeneratorThread.image_urls)  # Display the images
+        self.gallery.show()  # Show the ImageGallery
 
-    def handle_image_generation_progress(self, progress):
-        logging.debug("Image generation progress: %d", progress)
+    def boost_prompt(self):
+        art_prompt = self.promptInput.toPlainText()
+        self.boostArtPromptThread = BoostArtPromptThread(art_prompt, self.selected_aesthetic)
+        self.boostArtPromptThread.promptBoosted.connect(self.set_prompt)
+        self.boostArtPromptThread.progressChanged.connect(self.update_progress)
+        self.boostArtPromptThread.start()
+
+    def on_image_generation_finished(self, results):
+        """ Called once the thread for generating images is complete """
+        logging.info(f"Image generation complete: {results}")
+        self.statusBar.showMessage("Artwork Generated!")
+
+    def set_prompt(self, boosted_prompt):
+        """ Update the art prompt with the boosted version """
+        logging.info(f"Art prompt boosted: {boosted_prompt}")
+        self.promptInput.setPlainText(boosted_prompt)
+
+    def update_progress(self, progress):
+        """ Update the progress bar """
         self.progressBar.setValue(progress)
-        self.statusBar.showMessage(f"Generating images... Progress: {progress}%")
 
-    def handle_image_generation_finished(self, urls):
-        logging.info("Image generation finished")
-        # Display the generated images in the gallery
-        self.gallery.display_images(urls)
-        self.gallery.show()
+    def update_image_size_display(self, value):
+        """ Update the display for image size """
+        image_size = 256 * 2 ** (value - 1)
+        self.imageSizeDisplay.display(f"{image_size}x{image_size}")
 
-        # Reset the progress bar and the status bar
-        self.progressBar.setValue(100)
-        self.statusBar.showMessage("Image generation completed.", 10000)  # Display for 10 seconds
+    def update_image_number_display(self, value):
+        """ Update the display for number of images """
+        self.imageNumberDisplay.display(value)
 
-    def handle_boost_prompt_finished(self):
-        logging.info("Art prompt boosting finished")
-        # Reset the progress bar and the status bar when the processing is finished
-        self.progressBar.setValue(100)
-        self.statusBar.showMessage("Art prompt boosting completed.", 10000)

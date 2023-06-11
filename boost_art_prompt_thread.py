@@ -10,7 +10,7 @@ class BoostArtPromptThread(QThread):
     promptBoosted = pyqtSignal(str)
     progressChanged = pyqtSignal(int)
 
-    def __init__(self, prompt, selected_aesthetic):
+    def __init__(self, prompt, selected_aesthetic=None):
         super().__init__()
         self.prompt = prompt
         self.selected_aesthetic = selected_aesthetic

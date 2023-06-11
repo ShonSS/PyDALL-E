@@ -8,13 +8,15 @@ logger = logging.getLogger(__name__)
 class ImageGenerator(QThread):
     progressChanged = pyqtSignal(int)
     finished = pyqtSignal(list)
+    thumbnailGenerated = pyqtSignal(bytes)  # Added thumbnailGenerated signal
 
-    def __init__(self, prompt, num_images, size):
+    def __init__(self, prompt, num_images, size, selected_aesthetic=None):
         super().__init__()
         self.prompt = prompt
         self.num_images = num_images
         self.size = size
         self.urls = []
+        self.selected_aesthetic = selected_aesthetic
 
     def run(self):
         logger.info("Starting image generation")
@@ -33,6 +35,16 @@ class ImageGenerator(QThread):
                 url = response["data"][0]["url"]
                 self.urls.append(url)
                 logger.info("Generated URL for image %d: %s", i + 1, url)
+
+                # Generate thumbnail
+                thumbnail_response = openai.Image.create(
+                    prompt=self.prompt,
+                    n=1,
+                    size=self.size,
+                    response_format="image"
+                )
+                thumbnail_bytes = thumbnail_response["data"][0]["image"]
+                self.thumbnailGenerated.emit(thumbnail_bytes)  # Emit the thumbnailGenerated signal
 
             except Exception as e:
                 logger.error("An error occurred during image generation: %s", str(e))
