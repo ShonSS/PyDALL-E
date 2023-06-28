@@ -37,9 +37,9 @@ def main():
 
     # Select a theme based on the lightness of the default window color
     if default_color.lightness() > 128:
-        apply_stylesheet(app, theme='light_purple.xml')
-    else:
         apply_stylesheet(app, theme='dark_purple.xml')
+    else:
+        apply_stylesheet(app, theme='light_purple.xml')
 
     logging.info("Application created")
 

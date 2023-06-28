@@ -1,10 +1,11 @@
 # gallery.py
-import requests
-from functools import partial
-from PyQt6.QtWidgets import QMainWindow, QLabel, QGridLayout, QVBoxLayout, QWidget, QDialog
-from PyQt6.QtGui import QPixmap
-from PyQt6.QtCore import Qt, pyqtSignal, QSize
 import time
+from functools import partial
+
+import requests
+from PyQt6.QtCore import Qt, pyqtSignal, QSize
+from PyQt6.QtGui import QPixmap
+from PyQt6.QtWidgets import QMainWindow, QLabel, QGridLayout, QVBoxLayout, QWidget, QDialog
 
 
 class ClickableLabel(QLabel):
@@ -78,7 +79,28 @@ class ImageGallery(QMainWindow):
 
         elapsed_time = time.time() - start_time
 
-        self.statusBar().showMessage(f"Generated {len(urls)} image(s) in {elapsed_time:.2f} seconds. Sizes: {', '.join(resolutions)}. Total size: {total_size_bytes / 1024:.1f} KB")
+        self.statusBar().showMessage(
+            f"Generated {len(urls)} image(s) in {elapsed_time:.2f} seconds. Sizes: {', '.join(resolutions)}. Total size: {total_size_bytes / 1024:.1f} KB")
+
+    def add_image(self, pixmap):
+        label = ClickableLabel()
+        thumbnail = pixmap.scaledToWidth(150, Qt.TransformationMode.SmoothTransformation)
+
+        label.setPixmap(thumbnail)
+        label.setCursor(Qt.CursorShape.PointingHandCursor)
+        label.clicked.connect(partial(self.display_full_size_image, pixmap))
+
+        # Add the ClickableLabel to the layout
+        row = len(self.image_labels) // 3  # 3 images per row
+        col = len(self.image_labels) % 3
+        self.grid_layout.addWidget(label, row, col)
+
+        # Store the label for later use
+        self.image_labels.append(label)
+
+    def add_thumbnail(self, pixmap):
+        # Assuming this needs to do similar thing to adding image, but you might need to customise this
+        self.add_image(pixmap)
 
     def clear_images(self):
         # Remove and delete the image labels
